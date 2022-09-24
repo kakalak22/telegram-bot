@@ -1,29 +1,52 @@
-require('dotenv').config();
-
+require('dotenv').config()
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 
 const { TOKEN, SERVER_URL } = process.env;
-const TELEGRAM_API = `https://api.telegram.org.bot${TOKEN}`;
+const TELEGRAM_API = `https://api.telegram.org/bot${TOKEN}`;
 const URI = `/webhook/${TOKEN}`;
 const WEBHOOK_URL = SERVER_URL + URI;
 
 const app = express();
 app.use(bodyParser.json());
 
-app.listen(process.env.PORT || 5000, async () => {
-    console.log('app running on port ', process.env.PORT || 5000);
+const init = async () => {
+    const api = `${TELEGRAM_API}/setWebhook?url=${WEBHOOK_URL}`;
+    const res = await axios.get(api);
+    console.log(res.data);
+};
+
+app.post(URI, async (req, res) => {
+    console.log(req.body);
+
+    const chatId = req.body.message.chat.id;
+    const text = req.body.message.text;
+
+
+
+    const responseMap = {
+        'wibu': 'japan is good ! UwU',
+        'kakalak': 'secret key-word !!!',
+    }
+
+    const resMessage = responseMap[text] ? responseMap[text] : text;
+
+    await axios.post(`${TELEGRAM_API}/sendMessage`, {
+        chat_id: chatId,
+        text: resMessage,
+    });
+
+    return res.send();
+});
+
+
+app.listen(8081, async () => {
+    console.log('app running on port ', 8081);
     await init();
 });
 
-const init = async () => {
-    try {
-        console.log(axios.get);
-        const res = await axios.get(`${TELEGRAM_API}/setWebhook?url=${WEBHOOK_URL}`);
-        console.log(res.data);
-    } catch (error) {
-        console.log(error);;
-    }
-};
+
+
+
 
