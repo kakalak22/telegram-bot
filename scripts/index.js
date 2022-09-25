@@ -22,16 +22,11 @@ app.post(URI, async (req, res) => {
 
     const chatId = req.body.message.chat.id;
     const text = req.body.message.text;
-
-
-
     const responseMap = {
         'wibu': 'japan is good ! UwU',
         'kakalak': 'secret key-word !!!',
     }
-
     const resMessage = responseMap[text] ? responseMap[text] : text;
-
     await axios.post(`${TELEGRAM_API}/sendMessage`, {
         chat_id: chatId,
         text: resMessage,
